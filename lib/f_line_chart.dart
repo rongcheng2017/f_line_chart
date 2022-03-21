@@ -24,6 +24,8 @@ class LineChart extends StatefulWidget {
 
   final Color lineColor;
   final double lineWidth;
+  final bool showXLineText;
+  final Color xLineTextColor;
 
   const LineChart({
     Key? key,
@@ -37,6 +39,8 @@ class LineChart extends StatefulWidget {
     this.xLineNums = 1,
     this.lineColor = const Color(0xFF1678FF),
     this.lineWidth = 1,
+    this.showXLineText = false,
+    this.xLineTextColor = const Color(0xFF858B9C),
     required this.points,
   }) : super(key: key);
 
@@ -60,6 +64,8 @@ class _LineChartState extends State<LineChart> {
         xLineNums: widget.xLineNums,
         lineColor: widget.lineColor,
         lineWidth: widget.lineWidth,
+        showXLineText: widget.showXLineText,
+        xLineTextColor: widget.xLineTextColor,
       ),
     );
   }

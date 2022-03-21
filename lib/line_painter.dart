@@ -30,6 +30,9 @@ class LinePainter extends CustomPainter {
   final double lineWidth;
   //是否显示x轴底下的文案
   final bool showXLineText;
+  //x轴底下的文案高度
+  final int textHeight = 13;
+  late Color? xLineTextColor;
 
   LinePainter({
     required this.bgColor,
@@ -37,6 +40,7 @@ class LinePainter extends CustomPainter {
     required this.xAxisWidth,
     required this.points,
     this.lineColor = const Color(0xFF1678FF),
+    this.xLineTextColor,
     this.lineWidth = 1,
     this.yAxisColor,
     this.yAxisWidth,
@@ -48,6 +52,7 @@ class LinePainter extends CustomPainter {
     _xAxisPaint = Paint()
       ..color = xAxisColor
       ..strokeWidth = xAxisWidth;
+    xLineTextColor = xLineTextColor ?? xAxisColor;
 
     if (drawYAxis) {
       yAxisColor = yAxisColor ?? xAxisColor;
@@ -69,8 +74,7 @@ class LinePainter extends CustomPainter {
 
     var realPoints = _generatePonits(points, size);
     drawPath(canvas, size, realPoints);
-
-    // _drawXLineText(canvas, size, realPoints);
+    if (showXLineText) _drawXLineText(canvas, size, realPoints);
     // drawText(canvas,size);
   }
 
@@ -93,8 +97,10 @@ class LinePainter extends CustomPainter {
       return;
     }
     //计算x轴线的间距
-    double xLineDuration =
-        (size.height - (xAxisWidth) * xLineNums) / (xLineNums - 1);
+    double xLineDuration = showXLineText
+        ? (size.height - (xAxisWidth) * xLineNums - textHeight) /
+            (xLineNums - 1)
+        : (size.height - (xAxisWidth) * xLineNums) / (xLineNums - 1);
     double startY = xAxisWidth / 2;
     for (int i = 0; i < xLineNums; ++i) {
       canvas.drawLine(
@@ -119,7 +125,8 @@ class LinePainter extends CustomPainter {
     var pointXWithDuraiton = size.width / (points.length - 1);
     var pointYValueDuration = (maxY.yValue - minY.yValue) / (points.length - 1);
     //让整个图上下有点空隙 不然size.height / (points.length-1);
-    var pointYWithDuraiton = size.height / (points.length);
+    var pointYWithDuraiton =
+        (size.height - (showXLineText ? textHeight : 0)) / (points.length);
 
     for (var element in points) {
       Point<double> point = Point(
@@ -186,19 +193,23 @@ class LinePainter extends CustomPainter {
   ///画x轴底下的文案
   void _drawXLineText(
       Canvas canvas, Size size, List<RealChartPoint> realPoints) {
-    var textPainter = TextPainter(
-      text: const TextSpan(
-          text: "可多种", style: TextStyle(color: Colors.red, fontSize: 10)),
-      textDirection: TextDirection.rtl,
-      textWidthBasis: TextWidthBasis.longestLine,
-    )..layout();
-    var startOffset = 50.0;
-// 绘制辅助矩形框，在文字绘制前即可通过textPainter.width和textPainter.height来获取文字绘制的宽度
-    canvas.drawRect(
-        Rect.fromLTRB(startOffset, startOffset, startOffset + textPainter.width,
-            startOffset + textPainter.height),
-        _bgRectPaint);
-    textPainter.paint(canvas, Offset(0, size.height - textPainter.height));
+    for (var element in realPoints) {
+      var textPainter = TextPainter(
+        text: TextSpan(
+            text: element.lineChartPoint.xStr,
+            style: TextStyle(color: xLineTextColor, fontSize: 10)),
+        textDirection: TextDirection.rtl,
+        textWidthBasis: TextWidthBasis.longestLine,
+      )..layout();
+      textPainter.paint(
+        canvas,
+        Offset(
+            element.point.x >= size.width
+                ? (element.point.x - textPainter.width)
+                : element.point.x,
+            size.height - textPainter.height),
+      );
+    }
   }
 }
 
