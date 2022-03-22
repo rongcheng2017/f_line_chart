@@ -57,9 +57,9 @@ class LineChart extends StatefulWidget {
 
 ## 使用介绍
 
+### 基础使用方法
 
 下面是最简单的使用demo
-
 ```dart
 class LineChartPage extends StatelessWidget {
   const LineChartPage({Key? key}) : super(key: key);
@@ -100,9 +100,59 @@ class LineChartPage extends StatelessWidget {
   }
 }
 ```
-运行效果如下：
+**运行效果如下**：
+
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a623f8f4ca364b93b5c3f7b999a31cb9~tplv-k3u1fbpfcp-watermark.image?)
 
+
+### LineChartPointConfig
+> 通过配置LineChartPointConfig来设置是否要显示节点，以及节点的颜色、大小等属性。
+```dart
+import 'package:flutter/material.dart';
+
+///折线图节点的配置
+class LineChartPointConfig {
+  //普通节点的颜色
+  final Color normalPonitColor;
+  //普通节点的半径
+  final double normalPointRadius;
+  //选中节点的颜色
+  final Color selectedPointColor;
+  //选中节点的样式
+  final double selectedPointRadius;
+  //是否显示节点
+  final bool showNormalPoints;
+  //是否显示选中节点
+  final bool showSelectedPoint;
+
+  LineChartPointConfig({
+    this.normalPonitColor = const Color(0xFF1678FF),
+    this.selectedPointColor = const Color(0xFF1678FF),
+    this.normalPointRadius = 2,
+    this.selectedPointRadius = 4,
+    this.showNormalPoints = false,
+    this.showSelectedPoint = false,
+  });
+}
+
+```
+简单使用如下
+```dart
+body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(50),
+          child: LineChart(
+            size: const Size(300, 200),
+            xLineNums: 6,
+            points: _mockData(),
+            showXLineText: true,
+            config: LineChartPointConfig(showNormalPoints: true),
+          ),
+        ),
+      ),
+```
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e179080384954f44b30bc478416e90d5~tplv-k3u1fbpfcp-watermark.image?)
 
 ## Additional information
 

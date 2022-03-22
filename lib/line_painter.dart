@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:f_line_chart/line_chart_point.dart';
+import 'package:f_line_chart/line_chart_point_config.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
@@ -34,20 +35,22 @@ class LinePainter extends CustomPainter {
   final int textHeight = 13;
   late Color? xLineTextColor;
 
-  LinePainter({
-    required this.bgColor,
-    required this.xAxisColor,
-    required this.xAxisWidth,
-    required this.points,
-    this.lineColor = const Color(0xFF1678FF),
-    this.xLineTextColor,
-    this.lineWidth = 1,
-    this.yAxisColor,
-    this.yAxisWidth,
-    this.drawYAxis = false,
-    this.xLineNums = 1,
-    this.showXLineText = false,
-  }) {
+  final LineChartPointConfig? config;
+
+  LinePainter(
+      {required this.bgColor,
+      required this.xAxisColor,
+      required this.xAxisWidth,
+      required this.points,
+      this.lineColor = const Color(0xFF1678FF),
+      this.xLineTextColor,
+      this.lineWidth = 1,
+      this.yAxisColor,
+      this.yAxisWidth,
+      this.drawYAxis = false,
+      this.xLineNums = 1,
+      this.showXLineText = false,
+      this.config}) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
       ..color = xAxisColor
@@ -73,9 +76,14 @@ class LinePainter extends CustomPainter {
     _drawYline(canvas, size);
 
     var realPoints = _generatePonits(points, size);
-    drawPath(canvas, size, realPoints);
-    if (showXLineText) _drawXLineText(canvas, size, realPoints);
-    // drawText(canvas,size);
+    _drawPath(canvas, size, realPoints);
+
+    if (showXLineText) {
+      _drawXLineText(canvas, size, realPoints);
+    }
+    if (config?.showNormalPoints == true) {
+      _drawPoints(canvas, size, realPoints, config!);
+    }
   }
 
   @override
@@ -172,7 +180,8 @@ class LinePainter extends CustomPainter {
     canvas.drawParagraph(paragraph, Offset(0, size.height - 15));
   }
 
-  void drawPath(Canvas canvas, Size size, List<RealChartPoint> realPoints) {
+  ///绘制折线图
+  void _drawPath(Canvas canvas, Size size, List<RealChartPoint> realPoints) {
     var linePaint = Paint()
       ..color = lineColor
       ..style = PaintingStyle.stroke
@@ -188,6 +197,18 @@ class LinePainter extends CustomPainter {
       }
     }
     canvas.drawPath(path, linePaint);
+  }
+
+  ///绘制节点上的原点
+  void _drawPoints(Canvas canvas, Size size, List<RealChartPoint> realPoints,
+      LineChartPointConfig config) {
+    Paint pointPaint = Paint()
+      ..color = config.normalPonitColor
+      ..style = PaintingStyle.fill;
+    for (var element in realPoints) {
+      canvas.drawCircle(Offset(element.point.x, element.point.y),
+          config.normalPointRadius, pointPaint);
+    }
   }
 
   ///画x轴底下的文案
