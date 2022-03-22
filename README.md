@@ -12,20 +12,53 @@ and the Flutter guide for
 -->
 
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a623f8f4ca364b93b5c3f7b999a31cb9~tplv-k3u1fbpfcp-watermark.image?)
-## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+## Features
+1.基础效果
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a623f8f4ca364b93b5c3f7b999a31cb9~tplv-k3u1fbpfcp-watermark.image?)
+
 
 ## Getting started
+以下是常用属性：
+```dart
+class LineChart extends StatefulWidget {
+  //数据
+  final List<LineChartPoint> points;
+  //折线图颜色
+  final Color lineColor;
+  //折线图宽度
+  final double lineWidth;
+  //背景色
+  final Color bgColor;
+  final Size size;
+  //水平方向的线的颜色
+  final Color xAxisColor;
+  //水平方向的线的宽度
+  final double xAxisWidth;
+  //垂直方向的线的颜色
+  final Color yAxisColor;
+  //垂直方向的线的宽度
+  final double yAxisWidth;
+  //是否绘制y轴
+  final bool drawYAxis;
+  // x轴条数 最上面的一条是整个chart的顶部
+  final int xLineNums;
+  
+  //是否显示x轴下方文字
+  final bool showXLineText;
+  //x轴下方文字颜色
+  final Color xLineTextColor;
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+  ...
+}
 
-## Usage
+```
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+## 使用介绍
+
+
+下面是最简单的使用demo
 
 ```dart
 class LineChartPage extends StatelessWidget {
@@ -67,6 +100,9 @@ class LineChartPage extends StatelessWidget {
   }
 }
 ```
+运行效果如下：
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a623f8f4ca364b93b5c3f7b999a31cb9~tplv-k3u1fbpfcp-watermark.image?)
+
 
 ## Additional information
 

@@ -5,26 +5,35 @@ import 'package:flutter/material.dart';
 
 import 'line_chart_point.dart';
 
-///
 /// 1. 获取widget宽 计算x轴上的刻度
 /// 2. 获取widget高 计算y轴  (maxHeight-minHeight)/xLineNums
 
 class LineChart extends StatefulWidget {
+  //数据
+  final List<LineChartPoint> points;
+  //折线图颜色
+  final Color lineColor;
+  //折线图宽度
+  final double lineWidth;
+  //背景色
   final Color bgColor;
   final Size size;
+  //水平方向的线的颜色
   final Color xAxisColor;
+  //水平方向的线的宽度
   final double xAxisWidth;
+  //垂直方向的线的颜色
   final Color yAxisColor;
+  //垂直方向的线的宽度
   final double yAxisWidth;
   //是否绘制y轴
   final bool drawYAxis;
   // x轴条数 最上面的一条是整个chart的顶部
   final int xLineNums;
-  final List<LineChartPoint> points;
-
-  final Color lineColor;
-  final double lineWidth;
+  
+  //是否显示x轴下方文字
   final bool showXLineText;
+  //x轴下方文字颜色
   final Color xLineTextColor;
 
   const LineChart({
