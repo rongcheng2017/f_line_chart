@@ -65,13 +65,6 @@ class LineChart extends StatefulWidget {
 }
 
 class _LineChartState extends State<LineChart> {
-  // SelectedLineController _selectedLineController;
-  @override
-  void initState() {
-    // _selectedLineController=SelectedLineController(painter);
-    super.initState();
-  }
-
   Offset? _touchOffset;
   @override
   Widget build(BuildContext context) {
@@ -82,10 +75,6 @@ class _LineChartState extends State<LineChart> {
       onPointerMove: (event) => setState(() {
         double x = event.localPosition.dx;
         double y = event.localPosition.dy;
-        if (x < 0 || y > widget.size.width) {
-          _touchOffset = null;
-          return;
-        }
         _touchOffset = Offset(event.localPosition.dx, event.localPosition.dy);
       }),
       onPointerUp: (event) => setState(() {

@@ -1,10 +1,8 @@
 import 'dart:math';
 
-import 'package:f_line_chart/f_line_chart.dart';
 import 'package:f_line_chart/line_chart_point.dart';
 import 'package:f_line_chart/line_chart_point_config.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
 
 class LineChartPainter extends CustomPainter {
   final Color bgColor;
@@ -90,14 +88,12 @@ class LineChartPainter extends CustomPainter {
       _drawPoints(canvas, size, realPoints, config!);
     }
     if (touchOffset != null) {
-      _drawSelectedYLine(canvas, size, touchOffset!);
+      _drawSelectedYLine(canvas, size, touchOffset!, realPoints);
     }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    debugPrint(" repaint ......");
-    // throw UnimplementedError();
     return true;
   }
 
@@ -128,19 +124,40 @@ class LineChartPainter extends CustomPainter {
   }
 
   //绘制触摸到屏幕上时画竖线
-  void _drawSelectedYLine(Canvas canvas, Size size, Offset offset) {
-    debugPrint(" _drawSelectedYLine ...... x: ${offset.dx}");
+  void _drawSelectedYLine(Canvas canvas, Size size, Offset offset,
+      List<RealChartPoint> realPoints) {
     if (offset.dx < 0 || offset.dx > size.width) {
       return;
     }
+    Paint selectedPonitFillPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    Paint selectedPonitStrokePaint = Paint()
+      ..color = lineColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
     Paint linePaint = Paint()
       ..color = Colors.black26
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
+
+    var points = realPoints.where((e) =>
+        e.point.x + pointXWithDuraiton / 2 >= offset.dx &&
+        e.point.x - pointXWithDuraiton / 2 <= offset.dx);
+    var selectedPoint = points.first;
     canvas.drawLine(
-        Offset(offset.dx, 0), Offset(offset.dx + 1, size.height), linePaint);
+        Offset(selectedPoint.point.x, 0),
+        Offset(selectedPoint.point.x + 1,
+            showXLineText ? size.height - textHeight : size.height),
+        linePaint);
+
+    canvas.drawCircle(Offset(selectedPoint.point.x, selectedPoint.point.y), 5,
+        selectedPonitStrokePaint);
+    canvas.drawCircle(Offset(selectedPoint.point.x, selectedPoint.point.y), 3,
+        selectedPonitFillPaint);
   }
 
+  double pointXWithDuraiton = 0.0;
   List<RealChartPoint> _generatePonits(List<LineChartPoint> points, Size size) {
     List<RealChartPoint> realPoints = <RealChartPoint>[];
     LineChartPoint maxY =
@@ -154,7 +171,8 @@ class LineChartPainter extends CustomPainter {
 
     //计算xDuration
     var pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
-    var pointXWithDuraiton = size.width / (points.length - 1);
+
+    pointXWithDuraiton = size.width / (points.length - 1);
     var pointYValueDuration = (maxY.yValue - minY.yValue) / (points.length - 1);
     //让整个图上下有点空隙 不然size.height / (points.length-1);
     var pointYWithDuraiton =
@@ -172,36 +190,6 @@ class LineChartPainter extends CustomPainter {
     }
 
     return realPoints;
-  }
-
-  void drawText(Canvas canvas, Size size) {
-    // 第一步
-    final paragraphStyle = ui.ParagraphStyle(
-        // 字体方向，有些国家语言是从右往左排版的
-        textDirection: TextDirection.ltr,
-        // 字体对齐方式
-        textAlign: TextAlign.justify,
-        fontSize: 10,
-        maxLines: 1,
-        // 字体超出大小时显示的提示
-        ellipsis: '...',
-        fontStyle: FontStyle.italic,
-        // 当我们设置[TextStyle.height]时 这个高度是否应用到字体顶部和底部
-        textHeightBehavior: const TextHeightBehavior(
-            applyHeightToFirstAscent: true, applyHeightToLastDescent: true));
-// 第二步 与第三步
-    final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
-      ..addText('ParagraphBuilder');
-// 第四步
-    var paragraph = paragraphBuilder.build();
-// 第五步
-    paragraph.layout(const ui.ParagraphConstraints(width: 100));
-// 画一个辅助矩形（可以通过paragraph.width和paragraph.height来获取绘制文字的宽高）
-    // canvas.drawRect(
-    //     Rect.fromLTRB(50, 50, 50 + paragraph.width, 50 + paragraph.height),
-    //     _bgRectPaint);
-// 第六步
-    canvas.drawParagraph(paragraph, Offset(0, size.height - 15));
   }
 
   ///绘制折线图
