@@ -1,7 +1,5 @@
 library f_line_chart;
 
-import 'dart:math';
-
 import 'package:f_line_chart/line_chart_point_config.dart';
 import 'package:f_line_chart/line_chart_painter.dart';
 import 'package:flutter/material.dart';
@@ -73,8 +71,6 @@ class _LineChartState extends State<LineChart> {
         _touchOffset = Offset(event.localPosition.dx, event.localPosition.dy);
       }),
       onPointerMove: (event) => setState(() {
-        double x = event.localPosition.dx;
-        double y = event.localPosition.dy;
         _touchOffset = Offset(event.localPosition.dx, event.localPosition.dy);
       }),
       onPointerUp: (event) => setState(() {

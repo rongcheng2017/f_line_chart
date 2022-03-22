@@ -14,10 +14,19 @@ class LineChartPointConfig {
   final bool showNormalPoints;
   //是否显示选中节点
   final bool showSelectedPoint;
+  //选中时的垂直线的颜色
+  final Color selectedLineColor;
+  //选中时的垂直线的宽度
+  final double selectedLineWidth;
+  //显示选中时的垂直线
+  final bool showSelectedLine;
 
   LineChartPointConfig({
     this.normalPonitColor = const Color(0xFF1678FF),
     this.selectedPointColor = const Color(0xFF1678FF),
+    this.selectedLineColor = const Color(0xFFA6A6A6),
+    this.showSelectedLine = false,
+    this.selectedLineWidth = 1,
     this.normalPointRadius = 2,
     this.selectedPointRadius = 4,
     this.showNormalPoints = false,

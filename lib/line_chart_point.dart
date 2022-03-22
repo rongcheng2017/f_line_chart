@@ -6,5 +6,9 @@ class LineChartPoint {
   final double yValue;
   final double xValue;
 
-  LineChartPoint({required this.xStr, required this.yStr, required this.yValue, required this.xValue});
+  LineChartPoint(
+      {required this.xStr,
+      required this.yStr,
+      required this.yValue,
+      required this.xValue});
 }

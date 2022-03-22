@@ -1,12 +1,18 @@
 
 
-## Features
+## 效果展示
 
-1.基础效果
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cccf3132cf2f4d03bbea9bc14192d82b~tplv-k3u1fbpfcp-watermark.image?)
+1. 基础效果
 
-2.显示节点的效果
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e179080384954f44b30bc478416e90d5~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a623f8f4ca364b93b5c3f7b999a31cb9~tplv-k3u1fbpfcp-watermark.image?)
+
+2. 显示节点的效果
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c018824b73d745f4be6845c9307c9eeb~tplv-k3u1fbpfcp-watermark.image?)
+
+3. 显示选中的效果
+  
+  ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/764edb676cb648b18fb393b02a11453c~tplv-k3u1fbpfcp-watermark.image?)
 
 ## 入门
 以下是常用属性：
@@ -102,6 +108,7 @@ class LineChartPage extends StatelessWidget {
 import 'package:flutter/material.dart';
 
 ///折线图节点的配置
+///折线图节点的配置
 class LineChartPointConfig {
   //普通节点的颜色
   final Color normalPonitColor;
@@ -115,10 +122,19 @@ class LineChartPointConfig {
   final bool showNormalPoints;
   //是否显示选中节点
   final bool showSelectedPoint;
+  //选中时的垂直线的颜色
+  final Color selectedLineColor;
+  //选中时的垂直线的宽度
+  final double selectedLineWidth;
+  //显示选中时的垂直线
+  final bool showSelectedLine;
 
   LineChartPointConfig({
     this.normalPonitColor = const Color(0xFF1678FF),
     this.selectedPointColor = const Color(0xFF1678FF),
+    this.selectedLineColor = const Color(0xFFA6A6A6),
+    this.showSelectedLine = false,
+    this.selectedLineWidth = 1,
     this.normalPointRadius = 2,
     this.selectedPointRadius = 4,
     this.showNormalPoints = false,
@@ -126,25 +142,53 @@ class LineChartPointConfig {
   });
 }
 
+
 ```
 简单使用如下
 ```dart
-body: Center(
+      body: Center(
         child: Container(
           margin: const EdgeInsets.all(50),
           child: LineChart(
+            bgColor: const Color(0xFFF7F8FA),
             size: const Size(300, 200),
             xLineNums: 6,
             points: _mockData(),
             showXLineText: true,
-            config: LineChartPointConfig(showNormalPoints: true),
+            config: LineChartPointConfig(
+                showNormalPoints: true,
+                ),
           ),
         ),
       ),
 ```
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e179080384954f44b30bc478416e90d5~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c018824b73d745f4be6845c9307c9eeb~tplv-k3u1fbpfcp-watermark.image?)
 
+
+
+设置选中竖线和选中圆环
+```dart
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(50),
+          child: LineChart(
+            bgColor: const Color(0xFFF7F8FA),
+            size: const Size(300, 200),
+            xLineNums: 6,
+            points: _mockData(),
+            showXLineText: true,
+            config: LineChartPointConfig(
+                showNormalPoints: true,
+                showSelectedLine: true,
+                showSelectedPoint: true),
+          ),
+        ),
+      ),
+```
+
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/764edb676cb648b18fb393b02a11453c~tplv-k3u1fbpfcp-watermark.image?)
 ## Additional information
 
 TODO: Tell users more about the package: where to find more information, how to 

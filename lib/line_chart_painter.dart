@@ -88,7 +88,7 @@ class LineChartPainter extends CustomPainter {
       _drawPoints(canvas, size, realPoints, config!);
     }
     if (touchOffset != null) {
-      _drawSelectedYLine(canvas, size, touchOffset!, realPoints);
+      _drawSelectedYLine(canvas, size, touchOffset!, realPoints, config!);
     }
   }
 
@@ -124,37 +124,53 @@ class LineChartPainter extends CustomPainter {
   }
 
   //绘制触摸到屏幕上时画竖线
-  void _drawSelectedYLine(Canvas canvas, Size size, Offset offset,
-      List<RealChartPoint> realPoints) {
+  void _drawSelectedYLine(
+      Canvas canvas,
+      Size size,
+      Offset offset,
+      List<RealChartPoint> realPoints,
+      LineChartPointConfig lineChartPointConfig) {
     if (offset.dx < 0 || offset.dx > size.width) {
       return;
     }
-    Paint selectedPonitFillPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    Paint selectedPonitStrokePaint = Paint()
-      ..color = lineColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    Paint linePaint = Paint()
-      ..color = Colors.black26
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
+    if (!lineChartPointConfig.showSelectedLine &&
+        !lineChartPointConfig.showSelectedPoint) {
+      return;
+    }
     var points = realPoints.where((e) =>
         e.point.x + pointXWithDuraiton / 2 >= offset.dx &&
         e.point.x - pointXWithDuraiton / 2 <= offset.dx);
     var selectedPoint = points.first;
-    canvas.drawLine(
-        Offset(selectedPoint.point.x, 0),
-        Offset(selectedPoint.point.x + 1,
-            showXLineText ? size.height - textHeight : size.height),
-        linePaint);
-
-    canvas.drawCircle(Offset(selectedPoint.point.x, selectedPoint.point.y), 5,
-        selectedPonitStrokePaint);
-    canvas.drawCircle(Offset(selectedPoint.point.x, selectedPoint.point.y), 3,
-        selectedPonitFillPaint);
+    //绘制选中节点时的竖线
+    if (lineChartPointConfig.showSelectedLine) {
+      Paint linePaint = Paint()
+        ..color = lineChartPointConfig.selectedLineColor
+        ..strokeWidth = lineChartPointConfig.selectedLineWidth
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(
+          Offset(selectedPoint.point.x, 0),
+          Offset(selectedPoint.point.x + lineChartPointConfig.selectedLineWidth,
+              showXLineText ? size.height - textHeight : size.height),
+          linePaint);
+    }
+    //绘制选中节点时的选中环
+    if (lineChartPointConfig.showSelectedPoint) {
+      Paint selectedPonitFillPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      Paint selectedPonitStrokePaint = Paint()
+        ..color = lineChartPointConfig.selectedPointColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = lineChartPointConfig.selectedPointRadius -
+            lineChartPointConfig.normalPointRadius;
+      canvas.drawCircle(Offset(selectedPoint.point.x, selectedPoint.point.y),
+          lineChartPointConfig.selectedPointRadius, selectedPonitStrokePaint);
+      canvas.drawCircle(
+          Offset(selectedPoint.point.x, selectedPoint.point.y),
+          lineChartPointConfig.selectedPointRadius -
+              lineChartPointConfig.normalPointRadius,
+          selectedPonitFillPaint);
+    }
   }
 
   double pointXWithDuraiton = 0.0;
