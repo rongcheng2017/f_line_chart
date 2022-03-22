@@ -1,11 +1,12 @@
 import 'dart:math';
 
+import 'package:f_line_chart/f_line_chart.dart';
 import 'package:f_line_chart/line_chart_point.dart';
 import 'package:f_line_chart/line_chart_point_config.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
-class LinePainter extends CustomPainter {
+class LineChartPainter extends CustomPainter {
   final Color bgColor;
   //x轴颜色
   final Color xAxisColor;
@@ -36,21 +37,25 @@ class LinePainter extends CustomPainter {
   late Color? xLineTextColor;
 
   final LineChartPointConfig? config;
+  //触摸的点
+  final Offset? touchOffset;
 
-  LinePainter(
-      {required this.bgColor,
-      required this.xAxisColor,
-      required this.xAxisWidth,
-      required this.points,
-      this.lineColor = const Color(0xFF1678FF),
-      this.xLineTextColor,
-      this.lineWidth = 1,
-      this.yAxisColor,
-      this.yAxisWidth,
-      this.drawYAxis = false,
-      this.xLineNums = 1,
-      this.showXLineText = false,
-      this.config}) {
+  LineChartPainter({
+    required this.bgColor,
+    required this.xAxisColor,
+    required this.xAxisWidth,
+    required this.points,
+    this.lineColor = const Color(0xFF1678FF),
+    this.xLineTextColor,
+    this.lineWidth = 1,
+    this.yAxisColor,
+    this.yAxisWidth,
+    this.drawYAxis = false,
+    this.xLineNums = 1,
+    this.showXLineText = false,
+    this.config,
+    this.touchOffset,
+  }) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
       ..color = xAxisColor
@@ -84,11 +89,16 @@ class LinePainter extends CustomPainter {
     if (config?.showNormalPoints == true) {
       _drawPoints(canvas, size, realPoints, config!);
     }
+    if (touchOffset != null) {
+      _drawSelectedYLine(canvas, size, touchOffset!);
+    }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    throw UnimplementedError();
+    debugPrint(" repaint ......");
+    // throw UnimplementedError();
+    return true;
   }
 
   void _drawYline(Canvas canvas, Size size) {
@@ -115,6 +125,20 @@ class LinePainter extends CustomPainter {
           Offset(0, startY), Offset(size.width, startY), _xAxisPaint);
       startY = startY + xLineDuration + xAxisWidth;
     }
+  }
+
+  //绘制触摸到屏幕上时画竖线
+  void _drawSelectedYLine(Canvas canvas, Size size, Offset offset) {
+    debugPrint(" _drawSelectedYLine ...... x: ${offset.dx}");
+    if (offset.dx < 0 || offset.dx > size.width) {
+      return;
+    }
+    Paint linePaint = Paint()
+      ..color = Colors.black26
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(
+        Offset(offset.dx, 0), Offset(offset.dx + 1, size.height), linePaint);
   }
 
   List<RealChartPoint> _generatePonits(List<LineChartPoint> points, Size size) {

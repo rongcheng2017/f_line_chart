@@ -1,7 +1,9 @@
 library f_line_chart;
 
+import 'dart:math';
+
 import 'package:f_line_chart/line_chart_point_config.dart';
-import 'package:f_line_chart/line_painter.dart';
+import 'package:f_line_chart/line_chart_painter.dart';
 import 'package:flutter/material.dart';
 
 import 'line_chart_point.dart';
@@ -63,24 +65,50 @@ class LineChart extends StatefulWidget {
 }
 
 class _LineChartState extends State<LineChart> {
+  // SelectedLineController _selectedLineController;
+  @override
+  void initState() {
+    // _selectedLineController=SelectedLineController(painter);
+    super.initState();
+  }
+
+  Offset? _touchOffset;
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: widget.size,
-      painter: LinePainter(
-        points: widget.points,
-        bgColor: widget.bgColor,
-        xAxisColor: widget.xAxisColor,
-        xAxisWidth: widget.xAxisWidth,
-        yAxisColor: widget.yAxisColor,
-        yAxisWidth: widget.yAxisWidth,
-        drawYAxis: widget.drawYAxis,
-        xLineNums: widget.xLineNums,
-        lineColor: widget.lineColor,
-        lineWidth: widget.lineWidth,
-        showXLineText: widget.showXLineText,
-        xLineTextColor: widget.xLineTextColor,
-        config: widget.config,
+    return Listener(
+      onPointerDown: (event) => setState(() {
+        _touchOffset = Offset(event.localPosition.dx, event.localPosition.dy);
+      }),
+      onPointerMove: (event) => setState(() {
+        double x = event.localPosition.dx;
+        double y = event.localPosition.dy;
+        if (x < 0 || y > widget.size.width) {
+          _touchOffset = null;
+          return;
+        }
+        _touchOffset = Offset(event.localPosition.dx, event.localPosition.dy);
+      }),
+      onPointerUp: (event) => setState(() {
+        _touchOffset = null;
+      }),
+      child: CustomPaint(
+        size: widget.size,
+        painter: LineChartPainter(
+          points: widget.points,
+          bgColor: widget.bgColor,
+          xAxisColor: widget.xAxisColor,
+          xAxisWidth: widget.xAxisWidth,
+          yAxisColor: widget.yAxisColor,
+          yAxisWidth: widget.yAxisWidth,
+          drawYAxis: widget.drawYAxis,
+          xLineNums: widget.xLineNums,
+          lineColor: widget.lineColor,
+          lineWidth: widget.lineWidth,
+          showXLineText: widget.showXLineText,
+          xLineTextColor: widget.xLineTextColor,
+          config: widget.config,
+          touchOffset: _touchOffset,
+        ),
       ),
     );
   }

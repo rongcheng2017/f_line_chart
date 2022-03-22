@@ -1,25 +1,14 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
 
 
 ## Features
+
 1.基础效果
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cccf3132cf2f4d03bbea9bc14192d82b~tplv-k3u1fbpfcp-watermark.image?)
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a623f8f4ca364b93b5c3f7b999a31cb9~tplv-k3u1fbpfcp-watermark.image?)
+2.显示节点的效果
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e179080384954f44b30bc478416e90d5~tplv-k3u1fbpfcp-watermark.image?)
 
-
-## Getting started
+## 入门
 以下是常用属性：
 ```dart
 class LineChart extends StatefulWidget {
@@ -59,7 +48,7 @@ class LineChart extends StatefulWidget {
 
 ### 基础使用方法
 
-下面是最简单的使用demo
+> 下面是最简单的使用demo
 ```dart
 class LineChartPage extends StatelessWidget {
   const LineChartPage({Key? key}) : super(key: key);
@@ -75,8 +64,10 @@ class LineChartPage extends StatelessWidget {
           margin: const EdgeInsets.all(50),
           child: LineChart(
             size: const Size(300, 200),
+            //水平方向线条个数
             xLineNums: 6,
             points: _mockData(),
+            //是否显示x轴下面的文案
             showXLineText: true,
           ),
         ),
