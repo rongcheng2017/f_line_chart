@@ -46,6 +46,11 @@ class LineChartPainter extends CustomPainter {
   final double startPadding;
   final double endPadding;
   final SelectedCallback? selectedCallback;
+  //多条折线
+  final List<List<LineChartPoint>>? multipleLinePoints;
+  //多条折线的颜色
+  final List<Color>? multipleLinePointsColor;
+
   LineChartPainter({
     required this.bgColor,
     required this.xAxisColor,
@@ -66,6 +71,8 @@ class LineChartPainter extends CustomPainter {
     this.startPadding = 10,
     this.endPadding = 15,
     this.selectedCallback,
+    this.multipleLinePoints,
+    this.multipleLinePointsColor,
   }) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
@@ -86,21 +93,30 @@ class LineChartPainter extends CustomPainter {
     // draw background
     var bgRect = Rect.fromLTRB(0, 0, size.width, size.height);
     canvas.drawRect(bgRect, _bgRectPaint);
-
-    double yLineMarkW = _drawYLineMarks(canvas, size);
+    var list = [[]];
+    list[0] = points;
+    List<Object> pointsList = multipleLinePoints ?? list;
+    double yLineMarkW =
+        _drawYLineMarks(canvas, size, pointsList[0] as List<LineChartPoint>);
 
     _drawXLines(canvas, size, yLineMarkW);
 
     _drawYline(canvas, size, yLineMarkW);
 
-    var realPoints = _generatePonits(points, size, yLineMarkW);
-    _drawPath(canvas, size, realPoints);
+    for (var element in pointsList) {
+      List<LineChartPoint> lineChartPoints = element as List<LineChartPoint>;
 
-    _drawXLineText(canvas, size, realPoints);
+      List<RealChartPoint> realPoints =
+          _generatePonits(lineChartPoints, size, yLineMarkW);
 
-    _drawPoints(canvas, size, realPoints, config);
+      _drawPath(canvas, size, realPoints);
 
-    _drawSelectedYLine(canvas, size, touchOffset, realPoints, config);
+      _drawXLineText(canvas, size, realPoints);
+
+      _drawPoints(canvas, size, realPoints, config);
+
+      _drawSelectedYLine(canvas, size, touchOffset, realPoints, config);
+    }
   }
 
   @override
@@ -326,7 +342,8 @@ class LineChartPainter extends CustomPainter {
   double yLineStartN = 0;
 
   ///画y轴上的标记，并返回标记文案所占的宽度
-  double _drawYLineMarks(Canvas canvas, Size size) {
+  double _drawYLineMarks(
+      Canvas canvas, Size size, List<LineChartPoint> points) {
     LineChartPoint maxY =
         points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
     LineChartPoint minY =
@@ -349,10 +366,9 @@ class LineChartPainter extends CustomPainter {
             (xLineNums - 1);
     yLineStartN = max1 - duration * (xLineNums - 1).toInt();
 
+    //不绘制文案
     if (!showYLineMark) return maxYLineMarkTextW;
     for (int i = 0; i < xLineNums; ++i) {
-      //不绘制文案
-
       var textPainter = TextPainter(
         text: TextSpan(
           text: "${(max1 - duration * i).toInt()}",

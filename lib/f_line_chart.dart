@@ -8,8 +8,7 @@ import 'line_chart_point.dart';
 
 typedef SelectedCallback = void Function(Offset offset, LineChartPoint point);
 
-/// 1. 获取widget宽 计算x轴上的刻度
-/// 2. 获取widget高 计算y轴  (maxHeight-minHeight)/xLineNums
+/// 具体实现在[LineChartPainter]
 class LineChart extends StatefulWidget {
   //数据
   final List<LineChartPoint> points;
@@ -47,6 +46,8 @@ class LineChart extends StatefulWidget {
 
   //节点选中时回调
   final SelectedCallback? selectedCallback;
+  //多条折线
+  final List<List<LineChartPoint>>? multipleLinePoints;
 
   const LineChart({
     Key? key,
@@ -66,6 +67,7 @@ class LineChart extends StatefulWidget {
     this.config,
     this.showYLineMark = false,
     this.selectedCallback,
+    this.multipleLinePoints,
   }) : super(key: key);
 
   @override
@@ -105,6 +107,7 @@ class _LineChartState extends State<LineChart> {
           touchOffset: _touchOffset,
           showYLineMark: widget.showYLineMark,
           selectedCallback: widget.selectedCallback,
+          multipleLinePoints: widget.multipleLinePoints,
         ),
       ),
     );
