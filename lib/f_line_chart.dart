@@ -28,7 +28,7 @@ class LineChart extends StatefulWidget {
   //垂直方向的线的宽度
   final double yAxisWidth;
   //是否绘制y轴
-  final bool drawYAxis;
+  final bool showYAxis;
   // x轴条数 最上面的一条是整个chart的顶部
   final int xLineNums;
 
@@ -49,7 +49,7 @@ class LineChart extends StatefulWidget {
     this.xAxisWidth = 1,
     this.yAxisColor = const Color(0xFFE2E4EA),
     this.yAxisWidth = 1,
-    this.drawYAxis = false,
+    this.showYAxis = false,
     this.xLineNums = 1,
     this.lineColor = const Color(0xFF1678FF),
     this.lineWidth = 1,
@@ -85,7 +85,7 @@ class _LineChartState extends State<LineChart> {
           xAxisWidth: widget.xAxisWidth,
           yAxisColor: widget.yAxisColor,
           yAxisWidth: widget.yAxisWidth,
-          drawYAxis: widget.drawYAxis,
+          drawYAxis: widget.showYAxis,
           xLineNums: widget.xLineNums,
           lineColor: widget.lineColor,
           lineWidth: widget.lineWidth,

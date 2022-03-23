@@ -20,6 +20,7 @@ class LineChartPointConfig {
   final double selectedLineWidth;
   //显示选中时的垂直线
   final bool showSelectedLine;
+  
 
   LineChartPointConfig({
     this.normalPonitColor = const Color(0xFF1678FF),

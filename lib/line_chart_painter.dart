@@ -37,7 +37,11 @@ class LineChartPainter extends CustomPainter {
   final LineChartPointConfig? config;
   //触摸的点
   final Offset? touchOffset;
-
+  //是否先Y轴的标记
+  final bool showYLineMark;
+  final double topPadding;
+  final double startPadding;
+  final double endPadding;
   LineChartPainter({
     required this.bgColor,
     required this.xAxisColor,
@@ -53,6 +57,10 @@ class LineChartPainter extends CustomPainter {
     this.showXLineText = false,
     this.config,
     this.touchOffset,
+    this.showYLineMark = true,
+    this.topPadding = 10,
+    this.startPadding = 10,
+    this.endPadding = 15,
   }) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
@@ -73,23 +81,21 @@ class LineChartPainter extends CustomPainter {
     // draw background
     var bgRect = Rect.fromLTRB(0, 0, size.width, size.height);
     canvas.drawRect(bgRect, _bgRectPaint);
-    // draw x line
-    _drawXLines(canvas, size);
-    // draw y line
-    _drawYline(canvas, size);
 
-    var realPoints = _generatePonits(points, size);
+    double yLineMarkW = _drawYLineMarks(canvas, size);
+
+    _drawXLines(canvas, size, yLineMarkW);
+
+    _drawYline(canvas, size, yLineMarkW);
+
+    var realPoints = _generatePonits(points, size, yLineMarkW);
     _drawPath(canvas, size, realPoints);
 
-    if (showXLineText) {
-      _drawXLineText(canvas, size, realPoints);
-    }
-    if (config?.showNormalPoints == true) {
-      _drawPoints(canvas, size, realPoints, config!);
-    }
-    if (touchOffset != null) {
-      _drawSelectedYLine(canvas, size, touchOffset!, realPoints, config!);
-    }
+    _drawXLineText(canvas, size, realPoints);
+
+    _drawPoints(canvas, size, realPoints, config);
+
+    _drawSelectedYLine(canvas, size, touchOffset, realPoints, config);
   }
 
   @override
@@ -97,28 +103,36 @@ class LineChartPainter extends CustomPainter {
     return true;
   }
 
-  void _drawYline(Canvas canvas, Size size) {
+  void _drawYline(Canvas canvas, Size size, double yLineMarkW) {
     if (drawYAxis) {
-      canvas.drawLine(Offset(yAxisWidth! / 2, 0),
-          Offset(yAxisWidth! / 2, size.height), _yAxisPaint!);
+      canvas.drawLine(
+          Offset(startPadding + yAxisWidth! / 2 + yLineMarkW, topPadding),
+          Offset(
+            startPadding + yAxisWidth! / 2 + yLineMarkW,
+            size.height - (showXLineText ? textHeight : 0),
+          ),
+          _yAxisPaint!);
     }
   }
 
-  void _drawXLines(Canvas canvas, Size size) {
+  void _drawXLines(Canvas canvas, Size size, double yLineW) {
     if (xLineNums == 1) {
-      canvas.drawLine(Offset(0, size.height - xAxisWidth / 2),
-          Offset(size.width, size.height - xAxisWidth / 2), _xAxisPaint);
+      canvas.drawLine(
+          Offset(startPadding + yLineW, size.height - xAxisWidth / 2),
+          Offset(size.width - endPadding, size.height - xAxisWidth / 2),
+          _xAxisPaint);
       return;
     }
     //计算x轴线的间距
     double xLineDuration = showXLineText
-        ? (size.height - (xAxisWidth) * xLineNums - textHeight) /
+        ? (size.height - (xAxisWidth) * xLineNums - textHeight - topPadding) /
             (xLineNums - 1)
-        : (size.height - (xAxisWidth) * xLineNums) / (xLineNums - 1);
-    double startY = xAxisWidth / 2;
+        : (size.height - (xAxisWidth) * xLineNums - topPadding) /
+            (xLineNums - 1);
+    double startY = xAxisWidth / 2 + topPadding;
     for (int i = 0; i < xLineNums; ++i) {
-      canvas.drawLine(
-          Offset(0, startY), Offset(size.width, startY), _xAxisPaint);
+      canvas.drawLine(Offset(startPadding + yLineW, startY),
+          Offset(size.width - endPadding, startY), _xAxisPaint);
       startY = startY + xLineDuration + xAxisWidth;
     }
   }
@@ -127,9 +141,12 @@ class LineChartPainter extends CustomPainter {
   void _drawSelectedYLine(
       Canvas canvas,
       Size size,
-      Offset offset,
+      Offset? offset,
       List<RealChartPoint> realPoints,
-      LineChartPointConfig lineChartPointConfig) {
+      LineChartPointConfig? lineChartPointConfig) {
+    if (offset == null || lineChartPointConfig == null) {
+      return;
+    }
     if (offset.dx < 0 || offset.dx > size.width) {
       return;
     }
@@ -148,7 +165,7 @@ class LineChartPainter extends CustomPainter {
         ..strokeWidth = lineChartPointConfig.selectedLineWidth
         ..style = PaintingStyle.stroke;
       canvas.drawLine(
-          Offset(selectedPoint.point.x, 0),
+          Offset(selectedPoint.point.x, topPadding),
           Offset(selectedPoint.point.x + lineChartPointConfig.selectedLineWidth,
               showXLineText ? size.height - textHeight : size.height),
           linePaint);
@@ -174,8 +191,10 @@ class LineChartPainter extends CustomPainter {
   }
 
   double pointXWithDuraiton = 0.0;
-  List<RealChartPoint> _generatePonits(List<LineChartPoint> points, Size size) {
+  List<RealChartPoint> _generatePonits(
+      List<LineChartPoint> points, Size size, double yLineMarkW) {
     List<RealChartPoint> realPoints = <RealChartPoint>[];
+
     LineChartPoint maxY =
         points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
     LineChartPoint minY =
@@ -185,23 +204,34 @@ class LineChartPainter extends CustomPainter {
     LineChartPoint minX =
         points.reduce((cur, next) => cur.xValue < next.xValue ? cur : next);
 
+    points.reduce((cur, next) => cur.yValue < next.yValue ? cur : next);
+    //向上扩大
+    double max1 = (maxY.yValue / 10).ceil() * 10;
+    //向下扩大
+    double min1 = yLineStartN;
+    //图表区的高度
+    double yH = (size.height - topPadding - (showXLineText ? textHeight : 0));
+    //竖直方向最小的宽度单位
+    double yMinLineWidthDuration = yH / (max1 - min1);
+
     //计算xDuration
     var pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
 
-    pointXWithDuraiton = size.width / (points.length - 1);
-    var pointYValueDuration = (maxY.yValue - minY.yValue) / (points.length - 1);
-    //让整个图上下有点空隙 不然size.height / (points.length-1);
-    var pointYWithDuraiton =
-        (size.height - (showXLineText ? textHeight : 0)) / (points.length);
+    var pointXWithDuraiton =
+        (size.width - startPadding - endPadding - yLineMarkW) /
+            (points.length - 1);
 
     for (var element in points) {
-      Point<double> point = Point(
-          (element.xValue - minX.xValue) /
-              pointXValueDuration *
-              pointXWithDuraiton,
-          (element.yValue - minY.yValue + pointYWithDuraiton / 2) /
-              pointYValueDuration *
-              pointYWithDuraiton);
+      var x = startPadding +
+          yLineMarkW +
+          ((element.xValue - minX.xValue) / pointXValueDuration) *
+              pointXWithDuraiton;
+      var valueH = (element.yValue - minY.yValue) * yMinLineWidthDuration;
+      var y = topPadding +
+          ((maxY.yValue - minY.yValue) * yMinLineWidthDuration -
+              valueH +
+              ((max1 - maxY.yValue) * yMinLineWidthDuration));
+      Point<double> point = Point(x, y);
       realPoints.add(RealChartPoint(point, element));
     }
 
@@ -229,9 +259,10 @@ class LineChartPainter extends CustomPainter {
 
   ///绘制节点上的原点
   void _drawPoints(Canvas canvas, Size size, List<RealChartPoint> realPoints,
-      LineChartPointConfig config) {
+      LineChartPointConfig? config) {
+    if (config?.showNormalPoints != true) return;
     Paint pointPaint = Paint()
-      ..color = config.normalPonitColor
+      ..color = config!.normalPonitColor
       ..style = PaintingStyle.fill;
     for (var element in realPoints) {
       canvas.drawCircle(Offset(element.point.x, element.point.y),
@@ -242,6 +273,7 @@ class LineChartPainter extends CustomPainter {
   ///画x轴底下的文案
   void _drawXLineText(
       Canvas canvas, Size size, List<RealChartPoint> realPoints) {
+    if (!showXLineText) return;
     for (var element in realPoints) {
       var textPainter = TextPainter(
         text: TextSpan(
@@ -252,13 +284,75 @@ class LineChartPainter extends CustomPainter {
       )..layout();
       textPainter.paint(
         canvas,
-        Offset(
-            element.point.x >= size.width
-                ? (element.point.x - textPainter.width)
-                : element.point.x,
+        Offset(element.point.x - textPainter.width / 2,
             size.height - textPainter.height),
       );
     }
+  }
+
+  ///y轴方向最小单元距离
+  double _getYLineWidthDuration(Size size, List<LineChartPoint> points) {
+    LineChartPoint maxY =
+        points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
+    LineChartPoint minY =
+        points.reduce((cur, next) => cur.yValue < next.yValue ? cur : next);
+    //向上扩大
+    double max1 = (maxY.yValue / 10).ceil() * 10;
+    //向下扩大
+    double min1 = (minY.yValue / 10).floor() * 10;
+
+    //y轴方向最小单元距离
+    return (size.height - topPadding - (showXLineText ? textHeight : 0)) /
+        (max1 - min1);
+  }
+
+  ///y轴最下面的竖直
+  double yLineStartN = 0;
+
+  ///画y轴上的标记，并返回标记文案所占的宽度
+  double _drawYLineMarks(Canvas canvas, Size size) {
+    LineChartPoint maxY =
+        points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
+    LineChartPoint minY =
+        points.reduce((cur, next) => cur.yValue < next.yValue ? cur : next);
+    //向上扩大
+    double max1 = (maxY.yValue / 10).ceil() * 10;
+    //向下扩大
+    double min1 = (minY.yValue / 10).floor() * 10;
+    //所有标记中文案最宽的
+    double maxYLineMarkTextW = 0.0;
+
+    double duration = (max1 - min1) / (xLineNums - 1);
+    if (minY.yValue > 10) {
+      int a = duration ~/ 10;
+      duration = (a + 1) * 10;
+    }
+    //y轴上每个单元间间距
+    double yLineHeightDuration =
+        (size.height - topPadding - (showXLineText ? textHeight : 0)) /
+            (xLineNums - 1);
+    yLineStartN = max1 - duration * (xLineNums - 1).toInt();
+
+    if (!showYLineMark) return maxYLineMarkTextW;
+    for (int i = 0; i < xLineNums; ++i) {
+      //不绘制文案
+
+      var textPainter = TextPainter(
+        text: TextSpan(
+          text: "${(max1 - duration * i).toInt()}",
+          style: TextStyle(color: xLineTextColor, fontSize: 10),
+        ),
+        textDirection: TextDirection.ltr,
+        textWidthBasis: TextWidthBasis.longestLine,
+      )..layout();
+      maxYLineMarkTextW = max(maxYLineMarkTextW, textPainter.width);
+      textPainter.paint(
+        canvas,
+        Offset(startPadding - 1,
+            topPadding + yLineHeightDuration * i - textPainter.height / 2),
+      );
+    }
+    return maxYLineMarkTextW;
   }
 }
 
