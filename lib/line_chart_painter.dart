@@ -1,8 +1,11 @@
 import 'dart:math';
 
+import 'package:f_line_chart/f_line_chart.dart';
 import 'package:f_line_chart/line_chart_point.dart';
 import 'package:f_line_chart/line_chart_point_config.dart';
 import 'package:flutter/material.dart';
+
+double _selectedX = -1000;
 
 class LineChartPainter extends CustomPainter {
   final Color bgColor;
@@ -42,6 +45,7 @@ class LineChartPainter extends CustomPainter {
   final double topPadding;
   final double startPadding;
   final double endPadding;
+  final SelectedCallback? selectedCallback;
   LineChartPainter({
     required this.bgColor,
     required this.xAxisColor,
@@ -61,6 +65,7 @@ class LineChartPainter extends CustomPainter {
     this.topPadding = 10,
     this.startPadding = 10,
     this.endPadding = 15,
+    this.selectedCallback,
   }) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
@@ -145,6 +150,7 @@ class LineChartPainter extends CustomPainter {
       List<RealChartPoint> realPoints,
       LineChartPointConfig? lineChartPointConfig) {
     if (offset == null || lineChartPointConfig == null) {
+      _selectedX = -1000;
       return;
     }
 
@@ -161,6 +167,14 @@ class LineChartPainter extends CustomPainter {
     });
     if (points.isEmpty) return;
     var selectedPoint = points.first;
+    if (selectedPoint.point.x != _selectedX) {
+      _selectedX = selectedPoint.point.x;
+      //选中事件回调
+      selectedCallback?.call(
+          Offset(selectedPoint.point.x, selectedPoint.point.y),
+          selectedPoint.lineChartPoint);
+    }
+
     //绘制选中节点时的竖线
     if (lineChartPointConfig.showSelectedLine) {
       Paint linePaint = Paint()
@@ -220,9 +234,8 @@ class LineChartPainter extends CustomPainter {
     //计算xDuration
     var pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
 
-     pointXWithDuraiton =
-        (size.width - startPadding - endPadding - yLineMarkW) /
-            (points.length - 1);
+    pointXWithDuraiton = (size.width - startPadding - endPadding - yLineMarkW) /
+        (points.length - 1);
 
     for (var element in points) {
       var x = startPadding +

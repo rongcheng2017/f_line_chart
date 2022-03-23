@@ -218,6 +218,22 @@ class LineChartPointConfig {
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7f24d66433cf488fb15156f94d929ed6~tplv-k3u1fbpfcp-watermark.image?)
 
+
+设置节点选中回调:
+
+```dart
+LineChart(
+          ...
+            selectedCallback: (offset, point) {
+              debugPrint(
+                  " selectedCallback offset : x ${offset.dx}  y ${offset.dy}  point ${point.xStr}");
+            },
+            ...
+          ),
+```
+
+
+
 ## Additional information
 
 TODO: Tell users more about the package: where to find more information, how to 

@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 
 import 'line_chart_point.dart';
 
+typedef SelectedCallback = void Function(Offset offset,LineChartPoint point);
+
 /// 1. 获取widget宽 计算x轴上的刻度
 /// 2. 获取widget高 计算y轴  (maxHeight-minHeight)/xLineNums
-
 class LineChart extends StatefulWidget {
   //数据
   final List<LineChartPoint> points;
@@ -43,6 +44,8 @@ class LineChart extends StatefulWidget {
   ///显示Y轴上的标记文案
   final bool showYLineMark;
 
+  final SelectedCallback? selectedCallback;
+
   const LineChart({
     Key? key,
     required this.points,
@@ -60,6 +63,7 @@ class LineChart extends StatefulWidget {
     this.xLineTextColor = const Color(0xFF858B9C),
     this.config,
     this.showYLineMark = false,
+    this.selectedCallback,
   }) : super(key: key);
 
   @override
@@ -98,6 +102,7 @@ class _LineChartState extends State<LineChart> {
           config: widget.config,
           touchOffset: _touchOffset,
           showYLineMark: widget.showYLineMark,
+          selectedCallback: widget.selectedCallback,
         ),
       ),
     );
