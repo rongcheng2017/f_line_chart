@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'line_chart_point.dart';
 
-typedef SelectedCallback = void Function(Offset offset,LineChartPoint point);
+typedef SelectedCallback = void Function(Offset offset, LineChartPoint point);
 
 /// 1. 获取widget宽 计算x轴上的刻度
 /// 2. 获取widget高 计算y轴  (maxHeight-minHeight)/xLineNums
@@ -19,6 +19,7 @@ class LineChart extends StatefulWidget {
   final double lineWidth;
   //背景色
   final Color bgColor;
+  //折线图大小
   final Size size;
   //水平方向的线的颜色
   final Color xAxisColor;
@@ -44,6 +45,7 @@ class LineChart extends StatefulWidget {
   ///显示Y轴上的标记文案
   final bool showYLineMark;
 
+  //节点选中时回调
   final SelectedCallback? selectedCallback;
 
   const LineChart({
