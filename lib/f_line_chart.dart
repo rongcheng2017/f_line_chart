@@ -40,6 +40,9 @@ class LineChart extends StatefulWidget {
   ///折线图上点的设置
   final LineChartPointConfig? config;
 
+  ///显示Y轴上的标记文案
+  final bool showYLineMark;
+
   const LineChart({
     Key? key,
     required this.points,
@@ -56,6 +59,7 @@ class LineChart extends StatefulWidget {
     this.showXLineText = false,
     this.xLineTextColor = const Color(0xFF858B9C),
     this.config,
+    this.showYLineMark = false,
   }) : super(key: key);
 
   @override
@@ -93,6 +97,7 @@ class _LineChartState extends State<LineChart> {
           xLineTextColor: widget.xLineTextColor,
           config: widget.config,
           touchOffset: _touchOffset,
+          showYLineMark: widget.showYLineMark,
         ),
       ),
     );

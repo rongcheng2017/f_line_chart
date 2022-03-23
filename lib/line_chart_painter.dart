@@ -57,7 +57,7 @@ class LineChartPainter extends CustomPainter {
     this.showXLineText = false,
     this.config,
     this.touchOffset,
-    this.showYLineMark = true,
+    this.showYLineMark = false,
     this.topPadding = 10,
     this.startPadding = 10,
     this.endPadding = 15,
@@ -147,16 +147,19 @@ class LineChartPainter extends CustomPainter {
     if (offset == null || lineChartPointConfig == null) {
       return;
     }
-    if (offset.dx < 0 || offset.dx > size.width) {
+
+    if (offset.dx < 0 || offset.dx > (size.width - endPadding)) {
       return;
     }
     if (!lineChartPointConfig.showSelectedLine &&
         !lineChartPointConfig.showSelectedPoint) {
       return;
     }
-    var points = realPoints.where((e) =>
-        e.point.x + pointXWithDuraiton / 2 >= offset.dx &&
-        e.point.x - pointXWithDuraiton / 2 <= offset.dx);
+    var points = realPoints.where((e) {
+      return e.point.x + pointXWithDuraiton / 2 >= offset.dx &&
+          e.point.x - pointXWithDuraiton / 2 <= offset.dx;
+    });
+    if (points.isEmpty) return;
     var selectedPoint = points.first;
     //绘制选中节点时的竖线
     if (lineChartPointConfig.showSelectedLine) {
@@ -217,7 +220,7 @@ class LineChartPainter extends CustomPainter {
     //计算xDuration
     var pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
 
-    var pointXWithDuraiton =
+     pointXWithDuraiton =
         (size.width - startPadding - endPadding - yLineMarkW) /
             (points.length - 1);
 

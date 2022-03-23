@@ -12,7 +12,11 @@
 
 3. 显示选中的效果
   
-  ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/764edb676cb648b18fb393b02a11453c~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/764edb676cb648b18fb393b02a11453c~tplv-k3u1fbpfcp-watermark.image?)
+
+4. 显示y轴数据
+  
+  ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7f24d66433cf488fb15156f94d929ed6~tplv-k3u1fbpfcp-watermark.image?)  
 
 ## 入门
 以下是常用属性：
@@ -189,6 +193,31 @@ class LineChartPointConfig {
 
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/764edb676cb648b18fb393b02a11453c~tplv-k3u1fbpfcp-watermark.image?)
+
+显示Y轴以及显示y轴上的单元数据。
+```dart
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(50),
+          child: LineChart(
+            // bgColor: Color.fromARGB(255, 179, 216, 94),
+            size: const Size(300, 200),
+            xLineNums: 6,
+            points: _mockData1(),
+            showXLineText: true,
+            //显示y轴
+            showYAxis: true,
+            //显示y轴上的标记文案
+            showYLineMark: true,
+            config: LineChartPointConfig(
+                showNormalPoints: true,
+                showSelectedLine: true,
+                showSelectedPoint: true),
+          ),
+```
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7f24d66433cf488fb15156f94d929ed6~tplv-k3u1fbpfcp-watermark.image?)
+
 ## Additional information
 
 TODO: Tell users more about the package: where to find more information, how to 
