@@ -4,6 +4,7 @@ import 'package:f_line_chart/f_line_chart.dart';
 import 'package:f_line_chart/line_chart_point.dart';
 import 'package:f_line_chart/line_chart_point_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 double _selectedX = -1000;
 
@@ -93,8 +94,10 @@ class LineChartPainter extends CustomPainter {
     // draw background
     var bgRect = Rect.fromLTRB(0, 0, size.width, size.height);
     canvas.drawRect(bgRect, _bgRectPaint);
-    if (!(multipleLinePoints?.isNotEmpty == true || points?.isNotEmpty == true))
+    if (!(multipleLinePoints?.isNotEmpty == true ||
+        points?.isNotEmpty == true)) {
       return;
+    }
     var list = [points];
     List<Object?> pointsList = multipleLinePoints ?? list;
 
@@ -224,8 +227,10 @@ class LineChartPainter extends CustomPainter {
     //选中事件回调
     if (selectedPoint?.x != _selectedX) {
       _selectedX = selectedPoint?.x ?? 0;
-      selectedCallback?.call(
-          Offset(selectedPoint?.x ?? 0, selectedPoint?.y ?? 0), res);
+      SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
+        selectedCallback?.call(
+            Offset(selectedPoint?.x ?? 0, selectedPoint?.y ?? 0), res);
+      });
     }
 
     //绘制选中节点时的竖线
