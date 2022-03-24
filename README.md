@@ -16,7 +16,11 @@
 
 4. 显示y轴数据
   
-  ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7f24d66433cf488fb15156f94d929ed6~tplv-k3u1fbpfcp-watermark.image?)  
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7f24d66433cf488fb15156f94d929ed6~tplv-k3u1fbpfcp-watermark.image?)  
+
+5. 多折线版本
+  
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ed4d164d1dcf47e6890828abd9c39aa3~tplv-k3u1fbpfcp-watermark.image?)
 
 ## 入门
 以下是常用属性：
@@ -232,10 +236,102 @@ LineChart(
           ),
 ```
 
+显示多条折线
 
+> 通过`multipleLinePoints`设置多条折线的数据和`multipleLinePointsColor`设置颜色。
+```dart
+class LineChartPage extends StatefulWidget {
+  const LineChartPage({Key? key}) : super(key: key);
+
+  @override
+  State<LineChartPage> createState() => _LineChartPageState();
+}
+
+class _LineChartPageState extends State<LineChartPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("f_line_chart"),
+      ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(50),
+          child: LineChart(
+            // bgColor: Color.fromARGB(255, 179, 216, 94),
+            size: const Size(300, 200),
+            xLineNums: 6,
+            multipleLinePoints: _mockData1(),
+            multipleLinePointsColor: const [
+              Color(0xFFFF9E3D),
+              Color(0xFF006BFF),
+              Color(0xFF24A69B),
+            ],
+            showXLineText: true,
+            showYAxis: false,
+            showYLineMark: false,
+            selectedCallback: (Offset offset, List<LineChartPoint> points) {
+              debugPrint(
+                  " selectedCallback offset : x ${offset.dx}  y ${offset.dy} ");
+              for (var element in points) {
+                debugPrint(
+                    "selected points :${element.xValue} ${element.yValue}");
+              }
+            },
+            config: LineChartPointConfig(
+                showNormalPoints: true,
+                showSelectedLine: true,
+                showSelectedPoint: true),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+  List<List<LineChartPoint>> _mockData1() {
+    var res = <LineChartPoint>[];
+    res.add(LineChartPoint(xStr: "01", xValue: 1, yStr: "100", yValue: 102));
+    res.add(LineChartPoint(xStr: "02", xValue: 2, yStr: "200", yValue: 130));
+    res.add(LineChartPoint(xStr: "03", xValue: 3, yStr: "300", yValue: 110));
+    res.add(LineChartPoint(xStr: "04", xValue: 4, yStr: "400", yValue: 120));
+    res.add(LineChartPoint(xStr: "05", xValue: 5, yStr: "400", yValue: 170));
+    res.add(LineChartPoint(xStr: "06", xValue: 6, yStr: "400", yValue: 110));
+    res.add(LineChartPoint(xStr: "07", xValue: 7, yStr: "300", yValue: 130));
+    res.add(LineChartPoint(xStr: "08", xValue: 8, yStr: "400", yValue: 234));
+    res.add(LineChartPoint(xStr: "09", xValue: 9, yStr: "400", yValue: 110));
+    res.add(LineChartPoint(xStr: "10", xValue: 10, yStr: "400", yValue: 140));
+    var res1 = <LineChartPoint>[];
+    res1.add(LineChartPoint(xStr: "01", xValue: 1, yStr: "100", yValue: 110));
+    res1.add(LineChartPoint(xStr: "02", xValue: 2, yStr: "200", yValue: 140));
+    res1.add(LineChartPoint(xStr: "03", xValue: 3, yStr: "300", yValue: 120));
+    res1.add(LineChartPoint(xStr: "04", xValue: 4, yStr: "400", yValue: 100));
+    res1.add(LineChartPoint(xStr: "05", xValue: 5, yStr: "400", yValue: 160));
+    res1.add(LineChartPoint(xStr: "06", xValue: 6, yStr: "400", yValue: 100));
+    res1.add(LineChartPoint(xStr: "07", xValue: 7, yStr: "300", yValue: 120));
+    res1.add(LineChartPoint(xStr: "08", xValue: 8, yStr: "400", yValue: 210));
+    res1.add(LineChartPoint(xStr: "09", xValue: 9, yStr: "400", yValue: 70));
+    res1.add(LineChartPoint(xStr: "10", xValue: 10, yStr: "400", yValue: 80));
+    var res2 = <LineChartPoint>[];
+    res2.add(LineChartPoint(xStr: "01", xValue: 1, yStr: "100", yValue: 140));
+    res2.add(LineChartPoint(xStr: "02", xValue: 2, yStr: "200", yValue: 160));
+    res2.add(LineChartPoint(xStr: "03", xValue: 3, yStr: "300", yValue: 110));
+    res2.add(LineChartPoint(xStr: "04", xValue: 4, yStr: "400", yValue: 100));
+    res2.add(LineChartPoint(xStr: "05", xValue: 5, yStr: "400", yValue: 160));
+    res2.add(LineChartPoint(xStr: "06", xValue: 6, yStr: "400", yValue: 80));
+    res2.add(LineChartPoint(xStr: "07", xValue: 7, yStr: "300", yValue: 100));
+    res2.add(LineChartPoint(xStr: "08", xValue: 8, yStr: "400", yValue: 150));
+    res2.add(LineChartPoint(xStr: "09", xValue: 9, yStr: "400", yValue: 60));
+    res2.add(LineChartPoint(xStr: "10", xValue: 10, yStr: "400", yValue: 80));
+    var mutil = [res, res1, res2];
+    return mutil;
+  }
+```
+效果如下：
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ed4d164d1dcf47e6890828abd9c39aa3~tplv-k3u1fbpfcp-watermark.image?)
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+掘金文档： https://juejin.cn/post/7078496478750048263

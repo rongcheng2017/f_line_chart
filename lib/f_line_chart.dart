@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 
 import 'line_chart_point.dart';
 
-typedef SelectedCallback = void Function(Offset offset, LineChartPoint point);
+typedef SelectedCallback = void Function(
+    Offset offset, List<LineChartPoint> points);
 
 /// 具体实现在[LineChartPainter]
 class LineChart extends StatefulWidget {
   //数据
-  final List<LineChartPoint> points;
+  final List<LineChartPoint>? points;
   //折线图颜色
   final Color lineColor;
   //折线图宽度
@@ -48,10 +49,12 @@ class LineChart extends StatefulWidget {
   final SelectedCallback? selectedCallback;
   //多条折线
   final List<List<LineChartPoint>>? multipleLinePoints;
+  //多条折线的颜色
+  final List<Color>? multipleLinePointsColor;
 
-  const LineChart({
+  LineChart({
     Key? key,
-    required this.points,
+    this.points,
     this.bgColor = const Color(0xFFF7F8FA),
     this.size = Size.infinite,
     this.xAxisColor = const Color(0xFFE2E4EA),
@@ -68,7 +71,10 @@ class LineChart extends StatefulWidget {
     this.showYLineMark = false,
     this.selectedCallback,
     this.multipleLinePoints,
-  }) : super(key: key);
+    this.multipleLinePointsColor,
+  }) : super(key: key) {
+    // assert(points == null && multipleLinePoints == null);
+  }
 
   @override
   State<LineChart> createState() => _LineChartState();
@@ -108,6 +114,7 @@ class _LineChartState extends State<LineChart> {
           showYLineMark: widget.showYLineMark,
           selectedCallback: widget.selectedCallback,
           multipleLinePoints: widget.multipleLinePoints,
+          multipleLinePointsColor: widget.multipleLinePointsColor,
         ),
       ),
     );
