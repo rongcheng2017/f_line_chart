@@ -270,7 +270,8 @@ class _LineChartPageState extends State<LineChartPage> {
             showXLineText: true,
             showYAxis: false,
             showYLineMark: false,
-            selectedCallback: (Offset offset, List<LineChartPoint> points) {
+            selectedCallback: (Offset offset, List<LineChartPoint>? points) {
+              //如果points==null则代表没选中
               debugPrint(
                   " selectedCallback offset : x ${offset.dx}  y ${offset.dy} ");
               for (var element in points) {

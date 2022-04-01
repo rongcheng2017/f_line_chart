@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'line_chart_point.dart';
 
 typedef SelectedCallback = void Function(
-    Offset offset, List<LineChartPoint> points);
+    Offset offset, List<LineChartPoint>? points);
 
 /// 具体实现在[LineChartPainter]
 class LineChart extends StatefulWidget {

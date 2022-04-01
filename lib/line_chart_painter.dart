@@ -179,6 +179,9 @@ class LineChartPainter extends CustomPainter {
       List<Color> colors) {
     if (offset == null || lineChartPointConfig == null) {
       _selectedX = -1000;
+      SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
+        selectedCallback?.call(Offset.zero, null);
+      });
       return;
     }
 
@@ -196,8 +199,8 @@ class LineChartPainter extends CustomPainter {
     for (int i = 0; i < realPointsList.length; ++i) {
       var element = realPointsList[i] as List<RealChartPoint>;
       var points = element.where((e) {
-        return e.point.x + pointXWithDuraiton / 2 >= offset.dx &&
-            e.point.x - pointXWithDuraiton / 2 <= offset.dx;
+        return e.point.x + _pointXWithDuraiton / 2 >= offset.dx &&
+            e.point.x - _pointXWithDuraiton / 2 <= offset.dx;
       });
       if (points.isNotEmpty) {
         res.add(points.first.lineChartPoint);
@@ -247,7 +250,7 @@ class LineChartPainter extends CustomPainter {
     }
   }
 
-  double pointXWithDuraiton = 0.0;
+  double _pointXWithDuraiton = 0.0;
   List<RealChartPoint> _generatePonits(
       List<LineChartPoint> points, Size size, double yLineMarkW) {
     List<RealChartPoint> realPoints = <RealChartPoint>[];
@@ -270,14 +273,15 @@ class LineChartPainter extends CustomPainter {
     //计算xDuration
     var pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
 
-    pointXWithDuraiton = (size.width - startPadding - endPadding - yLineMarkW) /
-        (points.length - 1);
+    _pointXWithDuraiton =
+        (size.width - startPadding - endPadding - yLineMarkW) /
+            (points.length - 1);
 
     for (var element in points) {
       var x = startPadding +
           yLineMarkW +
           ((element.xValue - minX.xValue) / pointXValueDuration) *
-              pointXWithDuraiton;
+              _pointXWithDuraiton;
       var valueH = (element.yValue - minY.yValue) * yMinLineWidthDuration;
       var y = topPadding +
           ((maxY.yValue - minY.yValue) * yMinLineWidthDuration -
