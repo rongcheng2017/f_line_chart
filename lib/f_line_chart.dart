@@ -51,6 +51,8 @@ class LineChart extends StatefulWidget {
   final List<List<LineChartPoint>>? multipleLinePoints;
   //多条折线的颜色
   final List<Color>? multipleLinePointsColor;
+  //自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
+  final List<String>? xLineMarks;
 
   LineChart({
     Key? key,
@@ -72,6 +74,7 @@ class LineChart extends StatefulWidget {
     this.selectedCallback,
     this.multipleLinePoints,
     this.multipleLinePointsColor,
+    this.xLineMarks,
   }) : super(key: key) {
     // assert(points == null && multipleLinePoints == null);
   }
@@ -115,6 +118,7 @@ class _LineChartState extends State<LineChart> {
           selectedCallback: widget.selectedCallback,
           multipleLinePoints: widget.multipleLinePoints,
           multipleLinePointsColor: widget.multipleLinePointsColor,
+          xLineMarks: widget.xLineMarks,
         ),
       ),
     );

@@ -51,7 +51,8 @@ class LineChartPainter extends CustomPainter {
   final List<List<LineChartPoint>>? multipleLinePoints;
   //多条折线的颜色
   final List<Color>? multipleLinePointsColor;
-
+//自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
+  final List<String>? xLineMarks;
   LineChartPainter({
     required this.bgColor,
     required this.xAxisColor,
@@ -74,6 +75,7 @@ class LineChartPainter extends CustomPainter {
     this.selectedCallback,
     this.multipleLinePoints,
     this.multipleLinePointsColor,
+    this.xLineMarks,
   }) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
@@ -117,7 +119,7 @@ class LineChartPainter extends CustomPainter {
           _generatePonits(lineChartPoints, size, yLineMarkW);
       realChartPointsList.add(realPoints);
       if (i == 0) {
-        _drawXLineText(canvas, size, realPoints);
+        _drawXLineText(canvas, size, realPoints, yLineMarkW);
       }
       Color color = multipleLinePointsColor == null
           ? lineColor
@@ -329,9 +331,29 @@ class LineChartPainter extends CustomPainter {
   }
 
   ///画x轴底下的文案
-  void _drawXLineText(
-      Canvas canvas, Size size, List<RealChartPoint> realPoints) {
+  void _drawXLineText(Canvas canvas, Size size, List<RealChartPoint> realPoints,
+      double yLineMarkW) {
     if (!showXLineText) return;
+    if (xLineMarks?.isNotEmpty==true) {
+      var length = xLineMarks!.length;
+      var xDuration =
+          (size.width - startPadding - endPadding - yLineMarkW) / (length - 1);
+      for (var i = 0; i < length; i++) {
+        var textPainter = TextPainter(
+          text: TextSpan(
+              text: xLineMarks![i],
+              style: TextStyle(color: xLineTextColor, fontSize: 10)),
+          textDirection: TextDirection.rtl,
+          textWidthBasis: TextWidthBasis.longestLine,
+        )..layout();
+        textPainter.paint(
+          canvas,
+          Offset(startPadding+yLineMarkW+i * xDuration - textPainter.width / 2,
+              size.height - textPainter.height),
+        );
+      }
+      return;
+    }
     for (var element in realPoints) {
       var textPainter = TextPainter(
         text: TextSpan(

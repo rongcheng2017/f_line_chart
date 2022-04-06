@@ -27,3 +27,7 @@
 ## 1.0.4
 
 * 当手指离开折线图时，selectedCallback 返回points为null。
+
+## 1.0.5
+
+* 新增xLineMarks字段，用来自定义x轴下方标记文案。

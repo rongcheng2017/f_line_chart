@@ -26,14 +26,15 @@
 以下是常用属性：
 ```dart
 class LineChart extends StatefulWidget {
-  //数据
-  final List<LineChartPoint> points;
+   //数据
+  final List<LineChartPoint>? points;
   //折线图颜色
   final Color lineColor;
   //折线图宽度
   final double lineWidth;
   //背景色
   final Color bgColor;
+  //折线图大小
   final Size size;
   //水平方向的线的颜色
   final Color xAxisColor;
@@ -44,14 +45,29 @@ class LineChart extends StatefulWidget {
   //垂直方向的线的宽度
   final double yAxisWidth;
   //是否绘制y轴
-  final bool drawYAxis;
+  final bool showYAxis;
   // x轴条数 最上面的一条是整个chart的顶部
   final int xLineNums;
-  
+
   //是否显示x轴下方文字
   final bool showXLineText;
   //x轴下方文字颜色
   final Color xLineTextColor;
+
+  ///折线图上点的设置
+  final LineChartPointConfig? config;
+
+  ///显示Y轴上的标记文案
+  final bool showYLineMark;
+
+  //节点选中时回调
+  final SelectedCallback? selectedCallback;
+  //多条折线
+  final List<List<LineChartPoint>>? multipleLinePoints;
+  //多条折线的颜色
+  final List<Color>? multipleLinePointsColor;
+  //自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
+  final List<String>? xLineMarks;
 
   ...
 }
