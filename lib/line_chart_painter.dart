@@ -96,20 +96,26 @@ class LineChartPainter extends CustomPainter {
     // draw background
     var bgRect = Rect.fromLTRB(0, 0, size.width, size.height);
     canvas.drawRect(bgRect, _bgRectPaint);
-    if (!(multipleLinePoints?.isNotEmpty == true ||
-        points?.isNotEmpty == true)) {
-      return;
-    }
-    var list = [points];
+
+    var list = points == null ? [] : [points];
     List<Object?> pointsList = multipleLinePoints ?? list;
 
-    double yLineMarkW =
-        _drawYLineMarks(canvas, size, pointsList[0] as List<LineChartPoint>);
+    double yLineMarkW = pointsList.isNotEmpty
+        ? _drawYLineMarks(canvas, size, pointsList[0] as List<LineChartPoint>)
+        : 0;
 
     _drawXLines(canvas, size, yLineMarkW);
 
     _drawYline(canvas, size, yLineMarkW);
-
+    if (!(multipleLinePoints?.isNotEmpty == true ||
+        points?.isNotEmpty == true)) {
+      if (showXLineText) {
+        if (xLineMarks?.isNotEmpty == true) {
+          _drawXlineMarkedText(size, yLineMarkW, canvas);
+        }
+      }
+      return;
+    }
     var realChartPointsList = <List<RealChartPoint>>[];
     for (int i = 0; i < pointsList.length; i++) {
       List<LineChartPoint> lineChartPoints =
@@ -130,6 +136,27 @@ class LineChartPainter extends CustomPainter {
     }
     _drawSelectedYLine(canvas, size, touchOffset, realChartPointsList, config,
         multipleLinePointsColor ?? [lineColor]);
+  }
+
+  void _drawXlineMarkedText(Size size, double yLineMarkW, Canvas canvas) {
+    var length = xLineMarks!.length;
+    var xDuration =
+        (size.width - startPadding - endPadding - yLineMarkW) / (length - 1);
+    for (var i = 0; i < length; i++) {
+      var textPainter = TextPainter(
+        text: TextSpan(
+            text: xLineMarks![i],
+            style: TextStyle(color: xLineTextColor, fontSize: 10)),
+        textDirection: TextDirection.rtl,
+        textWidthBasis: TextWidthBasis.longestLine,
+      )..layout();
+      textPainter.paint(
+        canvas,
+        Offset(
+            startPadding + yLineMarkW + i * xDuration - textPainter.width / 2,
+            size.height - textPainter.height),
+      );
+    }
   }
 
   @override
@@ -334,24 +361,8 @@ class LineChartPainter extends CustomPainter {
   void _drawXLineText(Canvas canvas, Size size, List<RealChartPoint> realPoints,
       double yLineMarkW) {
     if (!showXLineText) return;
-    if (xLineMarks?.isNotEmpty==true) {
-      var length = xLineMarks!.length;
-      var xDuration =
-          (size.width - startPadding - endPadding - yLineMarkW) / (length - 1);
-      for (var i = 0; i < length; i++) {
-        var textPainter = TextPainter(
-          text: TextSpan(
-              text: xLineMarks![i],
-              style: TextStyle(color: xLineTextColor, fontSize: 10)),
-          textDirection: TextDirection.rtl,
-          textWidthBasis: TextWidthBasis.longestLine,
-        )..layout();
-        textPainter.paint(
-          canvas,
-          Offset(startPadding+yLineMarkW+i * xDuration - textPainter.width / 2,
-              size.height - textPainter.height),
-        );
-      }
+    if (xLineMarks?.isNotEmpty == true) {
+      _drawXlineMarkedText(size, yLineMarkW, canvas);
       return;
     }
     for (var element in realPoints) {
@@ -393,7 +404,8 @@ class LineChartPainter extends CustomPainter {
 
   ///画y轴上的标记，并返回标记文案所占的宽度
   double _drawYLineMarks(
-      Canvas canvas, Size size, List<LineChartPoint> points) {
+      Canvas canvas, Size size, List<LineChartPoint>? points) {
+    if (points == null) return 0;
     LineChartPoint maxY =
         points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
     LineChartPoint minY =
