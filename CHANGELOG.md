@@ -39,3 +39,8 @@
 ## 1.0.7
 
 * multipleLinePoints可以传null或者不传
+
+## 1.0.8
+
+* fix issue3 :https://github.com/rongcheng2017/f_line_chart/issues/3
+

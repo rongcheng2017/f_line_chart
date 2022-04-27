@@ -399,6 +399,10 @@ class LineChartPainter extends CustomPainter {
       duration = (a + 1) * 10;
     }
     var yLineStartN = max1 - duration * (xLineNums - 1).toInt();
+    if(max1-yLineStartN==0){
+      max1=6;
+      yLineStartN=0;
+    }
     return Point(max1, yLineStartN);
   }
 
