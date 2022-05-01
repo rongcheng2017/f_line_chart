@@ -286,6 +286,7 @@ class _LineChartPageState extends State<LineChartPage> {
             showXLineText: true,
             showYAxis: false,
             showYLineMark: false,
+           // yUnit:"%", 设置Y轴单位
             selectedCallback: (Offset offset, List<LineChartPoint>? points) {
               //如果points==null则代表没选中
               debugPrint(

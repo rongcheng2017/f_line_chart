@@ -53,30 +53,32 @@ class LineChartPainter extends CustomPainter {
   final List<Color>? multipleLinePointsColor;
 //自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
   final List<String>? xLineMarks;
-  LineChartPainter({
-    required this.bgColor,
-    required this.xAxisColor,
-    required this.xAxisWidth,
-    this.points,
-    this.lineColor = const Color(0xFF1678FF),
-    this.xLineTextColor,
-    this.lineWidth = 1,
-    this.yAxisColor,
-    this.yAxisWidth,
-    this.drawYAxis = false,
-    this.xLineNums = 1,
-    this.showXLineText = false,
-    this.config,
-    this.touchOffset,
-    this.showYLineMark = false,
-    this.topPadding = 10,
-    this.startPadding = 10,
-    this.endPadding = 15,
-    this.selectedCallback,
-    this.multipleLinePoints,
-    this.multipleLinePointsColor,
-    this.xLineMarks,
-  }) {
+
+  final String? yUnit;
+  LineChartPainter(
+      {required this.bgColor,
+      required this.xAxisColor,
+      required this.xAxisWidth,
+      this.points,
+      this.lineColor = const Color(0xFF1678FF),
+      this.xLineTextColor,
+      this.lineWidth = 1,
+      this.yAxisColor,
+      this.yAxisWidth,
+      this.drawYAxis = false,
+      this.xLineNums = 1,
+      this.showXLineText = false,
+      this.config,
+      this.touchOffset,
+      this.showYLineMark = false,
+      this.topPadding = 10,
+      this.startPadding = 10,
+      this.endPadding = 15,
+      this.selectedCallback,
+      this.multipleLinePoints,
+      this.multipleLinePointsColor,
+      this.xLineMarks,
+      this.yUnit}) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
       ..color = xAxisColor
@@ -399,9 +401,9 @@ class LineChartPainter extends CustomPainter {
       duration = (a + 1) * 10;
     }
     var yLineStartN = max1 - duration * (xLineNums - 1).toInt();
-    if(max1-yLineStartN==0){
-      max1=6;
-      yLineStartN=0;
+    if (max1 - yLineStartN == 0) {
+      max1 = 6;
+      yLineStartN = 0;
     }
     return Point(max1, yLineStartN);
   }
@@ -437,7 +439,7 @@ class LineChartPainter extends CustomPainter {
     for (int i = 0; i < xLineNums; ++i) {
       var textPainter = TextPainter(
         text: TextSpan(
-          text: "${(max1 - duration * i).toInt()}",
+          text: "${(max1 - duration * i).toInt()}$yUnit",
           style: TextStyle(color: xLineTextColor, fontSize: 10),
         ),
         textDirection: TextDirection.ltr,

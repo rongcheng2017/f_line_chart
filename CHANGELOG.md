@@ -44,3 +44,7 @@
 
 * fix issue3 :https://github.com/rongcheng2017/f_line_chart/issues/3
 
+
+## 1.0.9
+
+* fix issue4 :https://github.com/rongcheng2017/f_line_chart/issues/4  增加Y轴单位

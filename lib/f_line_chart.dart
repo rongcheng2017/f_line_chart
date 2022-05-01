@@ -53,6 +53,8 @@ class LineChart extends StatefulWidget {
   final List<Color>? multipleLinePointsColor;
   //自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
   final List<String>? xLineMarks;
+  //y轴上标记位的后缀（单位）
+  final String? yUnit;
 
   LineChart({
     Key? key,
@@ -75,6 +77,7 @@ class LineChart extends StatefulWidget {
     this.multipleLinePoints,
     this.multipleLinePointsColor,
     this.xLineMarks,
+    this.yUnit
   }) : super(key: key) {
     // assert(points == null && multipleLinePoints == null);
   }
@@ -119,6 +122,7 @@ class _LineChartState extends State<LineChart> {
           multipleLinePoints: widget.multipleLinePoints,
           multipleLinePointsColor: widget.multipleLinePointsColor,
           xLineMarks: widget.xLineMarks,
+          yUnit: widget.yUnit
         ),
       ),
     );
