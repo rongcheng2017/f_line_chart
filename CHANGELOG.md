@@ -48,3 +48,16 @@
 ## 1.0.9
 
 * fix issue4 :https://github.com/rongcheng2017/f_line_chart/issues/4  增加Y轴单位
+
+
+## 1.1.0
+
+* 使用 useUnifyYUnit: true 设置不同折线使用同一坐标系方法
+
+## 1.1.1
+
+* 提供LineChartController, 调用unSelceted()，方法来手动取消选中状态。在出现事件冲突时手动取消选中状态。
+  
+## 1.1.2
+
+* fix bug :NaN

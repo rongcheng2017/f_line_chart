@@ -51,34 +51,42 @@ class LineChartPainter extends CustomPainter {
   final List<List<LineChartPoint>>? multipleLinePoints;
   //多条折线的颜色
   final List<Color>? multipleLinePointsColor;
-//自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
+  //自定义x轴下方的标记文案，如果传入该数据，points中的marks失效。
   final List<String>? xLineMarks;
 
+  final bool useUnifyYUnit;
+
   final String? yUnit;
-  LineChartPainter(
-      {required this.bgColor,
-      required this.xAxisColor,
-      required this.xAxisWidth,
-      this.points,
-      this.lineColor = const Color(0xFF1678FF),
-      this.xLineTextColor,
-      this.lineWidth = 1,
-      this.yAxisColor,
-      this.yAxisWidth,
-      this.drawYAxis = false,
-      this.xLineNums = 1,
-      this.showXLineText = false,
-      this.config,
-      this.touchOffset,
-      this.showYLineMark = false,
-      this.topPadding = 10,
-      this.startPadding = 10,
-      this.endPadding = 15,
-      this.selectedCallback,
-      this.multipleLinePoints,
-      this.multipleLinePointsColor,
-      this.xLineMarks,
-      this.yUnit}) {
+  //当次不可选中
+  bool unSelected;
+
+  LineChartPainter({
+    required this.bgColor,
+    required this.xAxisColor,
+    required this.xAxisWidth,
+    this.points,
+    this.lineColor = const Color(0xFF1678FF),
+    this.xLineTextColor,
+    this.lineWidth = 1,
+    this.yAxisColor,
+    this.yAxisWidth,
+    this.drawYAxis = false,
+    this.xLineNums = 1,
+    this.showXLineText = false,
+    this.config,
+    this.touchOffset,
+    this.showYLineMark = false,
+    this.topPadding = 10,
+    this.startPadding = 10,
+    this.endPadding = 15,
+    this.selectedCallback,
+    this.multipleLinePoints,
+    this.multipleLinePointsColor,
+    this.xLineMarks,
+    this.yUnit,
+    this.useUnifyYUnit = false,
+    this.unSelected = false,
+  }) {
     _bgRectPaint = Paint()..color = bgColor;
     _xAxisPaint = Paint()
       ..color = xAxisColor
@@ -101,14 +109,25 @@ class LineChartPainter extends CustomPainter {
 
     var list = points == null ? [] : [points];
     List<Object?> pointsList = multipleLinePoints ?? list;
-
+    var realChartPointsList = <List<RealChartPoint>>[];
+    double maxPointOfAllCharts = 0;
+    if (useUnifyYUnit) {
+      maxPointOfAllCharts = generateMaxPointInAllChart(pointsList);
+    }
     double yLineMarkW = pointsList.isNotEmpty
-        ? _drawYLineMarks(canvas, size, pointsList[0] as List<LineChartPoint>)
+        ? _drawYLineMarks(
+            canvas: canvas,
+            size: size,
+            points: pointsList[0] as List<LineChartPoint>,
+            useUnifyYUnit: useUnifyYUnit,
+            maxPointV: maxPointOfAllCharts,
+          )
         : 0;
 
     _drawXLines(canvas, size, yLineMarkW);
 
     _drawYline(canvas, size, yLineMarkW);
+
     if (!(multipleLinePoints?.isNotEmpty == true ||
         points?.isNotEmpty == true)) {
       if (showXLineText) {
@@ -118,13 +137,18 @@ class LineChartPainter extends CustomPainter {
       }
       return;
     }
-    var realChartPointsList = <List<RealChartPoint>>[];
+
     for (int i = 0; i < pointsList.length; i++) {
       List<LineChartPoint> lineChartPoints =
           pointsList[i] as List<LineChartPoint>;
 
-      List<RealChartPoint> realPoints =
-          _generatePonits(lineChartPoints, size, yLineMarkW);
+      List<RealChartPoint> realPoints = _generatePonits(
+          points: lineChartPoints,
+          size: size,
+          yLineMarkW: yLineMarkW,
+          useUnifyYUnit: useUnifyYUnit,
+          maxPointOfAllCharts: maxPointOfAllCharts);
+
       realChartPointsList.add(realPoints);
       if (i == 0) {
         _drawXLineText(canvas, size, realPoints, yLineMarkW);
@@ -223,6 +247,10 @@ class LineChartPainter extends CustomPainter {
         !lineChartPointConfig.showSelectedPoint) {
       return;
     }
+    if (unSelected) {
+      unSelected = false;
+      return;
+    }
 
     //获取选中的点
     List<LineChartPoint> res = [];
@@ -283,10 +311,20 @@ class LineChartPainter extends CustomPainter {
 
   double _pointXWithDuraiton = 0.0;
   List<RealChartPoint> _generatePonits(
-      List<LineChartPoint> points, Size size, double yLineMarkW) {
+      {required List<LineChartPoint> points,
+      required Size size,
+      required double yLineMarkW,
+      bool useUnifyYUnit = false,
+      double maxPointOfAllCharts = 10.0}) {
     List<RealChartPoint> realPoints = <RealChartPoint>[];
+    //最高点和最低点
+    Point<double> maxAndMinP;
 
-    var maxAndMinP = getYLineMaxAndMinVal(points);
+    if (useUnifyYUnit) {
+      maxAndMinP = Point(maxPointOfAllCharts, 0);
+    } else {
+      maxAndMinP = getYLineMaxAndMinVal(points);
+    }
     LineChartPoint maxY =
         points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
     LineChartPoint minY =
@@ -300,9 +338,13 @@ class LineChartPainter extends CustomPainter {
     double yH = (size.height - topPadding - (showXLineText ? textHeight : 0));
     //竖直方向最小的宽度单位
     double yMinLineWidthDuration = yH / (maxAndMinP.x - maxAndMinP.y);
-
     //计算xDuration
-    var pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
+    var pointXValueDuration = 0.0;
+    if (maxX.xValue - minX.xValue == 0) {
+      pointXValueDuration = 10 / (points.length - 1);
+    } else {
+      pointXValueDuration = (maxX.xValue - minX.xValue) / (points.length - 1);
+    }
 
     _pointXWithDuraiton =
         (size.width - startPadding - endPadding - yLineMarkW) /
@@ -395,6 +437,9 @@ class LineChartPainter extends CustomPainter {
     double max1 = (maxY.yValue / 10).ceil() * 10;
     //向下扩大
     double min1 = (minY.yValue / 10).floor() * 10;
+    if (max1 - min1 == 0) {
+      max1 = max1 + 10;
+    }
     double duration = (max1 - min1) / (xLineNums - 1);
     if (minY.yValue > 10) {
       int a = duration ~/ 10;
@@ -410,36 +455,49 @@ class LineChartPainter extends CustomPainter {
 
   ///画y轴上的标记，并返回标记文案所占的宽度
   double _drawYLineMarks(
-      Canvas canvas, Size size, List<LineChartPoint>? points) {
+      {required Canvas canvas,
+      required Size size,
+      required List<LineChartPoint>? points,
+      bool useUnifyYUnit = false,
+      double maxPointV = 10.0}) {
     if (points == null) return 0;
-    LineChartPoint maxY =
-        points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
-    LineChartPoint minY =
-        points.reduce((cur, next) => cur.yValue < next.yValue ? cur : next);
-    //向上扩大
-    double max1 = (maxY.yValue / 10).ceil() * 10;
-    //向下扩大
-    double min1 = (minY.yValue / 10).floor() * 10;
+    double maxV;
+    double minV;
+    double duration;
+    if (useUnifyYUnit) {
+      maxV = maxPointV;
+      minV = 0;
+      duration = (maxV - minV) / (xLineNums - 1);
+    } else {
+      LineChartPoint maxY =
+          points.reduce((cur, next) => cur.yValue > next.yValue ? cur : next);
+      LineChartPoint minY =
+          points.reduce((cur, next) => cur.yValue < next.yValue ? cur : next);
+      //向上扩大
+      maxV = (maxY.yValue / 10).ceil() * 10;
+      //向下扩大
+      minV = (minY.yValue / 10).floor() * 10;
+
+      duration = (maxV - minV) / (xLineNums - 1);
+      if (minY.yValue > 10) {
+        int a = duration ~/ 10;
+        duration = (a + 1) * 10;
+      }
+    }
     //所有标记中文案最宽的
     double maxYLineMarkTextW = 0.0;
-
-    double duration = (max1 - min1) / (xLineNums - 1);
-    if (minY.yValue > 10) {
-      int a = duration ~/ 10;
-      duration = (a + 1) * 10;
-    }
     //y轴上每个单元间间距
     double yLineHeightDuration =
         (size.height - topPadding - (showXLineText ? textHeight : 0)) /
             (xLineNums - 1);
-    var yLineStartN = max1 - duration * (xLineNums - 1).toInt();
+    var yLineStartN = maxV - duration * (xLineNums - 1).toInt();
 
     //不绘制文案
     if (!showYLineMark) return maxYLineMarkTextW;
     for (int i = 0; i < xLineNums; ++i) {
       var textPainter = TextPainter(
         text: TextSpan(
-          text: "${(max1 - duration * i).toInt()}$yUnit",
+          text: "${(maxV - duration * i).toInt()}${yUnit ?? ''}",
           style: TextStyle(color: xLineTextColor, fontSize: 10),
         ),
         textDirection: TextDirection.ltr,
@@ -453,6 +511,19 @@ class LineChartPainter extends CustomPainter {
       );
     }
     return maxYLineMarkTextW;
+  }
+
+  //获取所有折线中的最大点
+  double generateMaxPointInAllChart(List<Object?> pointsList) {
+    double value = 0;
+    for (var element in pointsList) {
+      List<LineChartPoint> lineChartPoints = element as List<LineChartPoint>;
+      for (var element in lineChartPoints) {
+        value = max(element.yValue, value);
+      }
+    }
+    //向上扩大
+    return (value / 10).ceil() * 10;
   }
 }
 

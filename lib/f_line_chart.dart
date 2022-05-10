@@ -55,30 +55,36 @@ class LineChart extends StatefulWidget {
   final List<String>? xLineMarks;
   //y轴上标记位的后缀（单位）
   final String? yUnit;
+  //使用统一坐标系，不同折线不在动态计算Y轴，Y轴坐标从0~Max
+  final bool useUnifyYUnit;
 
-  LineChart({
-    Key? key,
-    this.points,
-    this.bgColor = const Color(0xFFF7F8FA),
-    this.size = Size.infinite,
-    this.xAxisColor = const Color(0xFFE2E4EA),
-    this.xAxisWidth = 1,
-    this.yAxisColor = const Color(0xFFE2E4EA),
-    this.yAxisWidth = 1,
-    this.showYAxis = false,
-    this.xLineNums = 1,
-    this.lineColor = const Color(0xFF1678FF),
-    this.lineWidth = 1,
-    this.showXLineText = false,
-    this.xLineTextColor = const Color(0xFF858B9C),
-    this.config,
-    this.showYLineMark = false,
-    this.selectedCallback,
-    this.multipleLinePoints,
-    this.multipleLinePointsColor,
-    this.xLineMarks,
-    this.yUnit
-  }) : super(key: key) {
+  final LineChartController? controller;
+
+  LineChart(
+      {Key? key,
+      this.points,
+      this.bgColor = const Color(0xFFF7F8FA),
+      this.size = Size.infinite,
+      this.xAxisColor = const Color(0xFFE2E4EA),
+      this.xAxisWidth = 1,
+      this.yAxisColor = const Color(0xFFE2E4EA),
+      this.yAxisWidth = 1,
+      this.showYAxis = false,
+      this.xLineNums = 1,
+      this.lineColor = const Color(0xFF1678FF),
+      this.lineWidth = 1,
+      this.showXLineText = false,
+      this.xLineTextColor = const Color(0xFF858B9C),
+      this.config,
+      this.showYLineMark = false,
+      this.selectedCallback,
+      this.multipleLinePoints,
+      this.multipleLinePointsColor,
+      this.xLineMarks,
+      this.yUnit = '',
+      this.useUnifyYUnit = false,
+      this.controller})
+      : super(key: key) {
     // assert(points == null && multipleLinePoints == null);
   }
 
@@ -88,10 +94,18 @@ class LineChart extends StatefulWidget {
 
 class _LineChartState extends State<LineChart> {
   Offset? _touchOffset;
+  bool _unSelected = false;
+  @override
+  void initState() {
+    widget.controller?.addState(this);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Listener(
       onPointerDown: (event) => setState(() {
+        _unSelected = false;
         _touchOffset = Offset(event.localPosition.dx, event.localPosition.dy);
       }),
       onPointerMove: (event) => setState(() {
@@ -122,9 +136,38 @@ class _LineChartState extends State<LineChart> {
           multipleLinePoints: widget.multipleLinePoints,
           multipleLinePointsColor: widget.multipleLinePointsColor,
           xLineMarks: widget.xLineMarks,
-          yUnit: widget.yUnit
+          useUnifyYUnit: widget.useUnifyYUnit,
+          yUnit: widget.yUnit,
+          unSelected: _unSelected,
         ),
       ),
     );
+  }
+
+  void unSelected() {
+    setState(() {
+      _unSelected = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.controller?.dispose();
+  }
+}
+
+class LineChartController {
+  _LineChartState? _lineChartState;
+  void addState(_LineChartState lineChartState) {
+    _lineChartState = lineChartState;
+  }
+
+  void unSelected() {
+    _lineChartState?.unSelected();
+  }
+
+  void dispose() {
+    _lineChartState = null;
   }
 }
