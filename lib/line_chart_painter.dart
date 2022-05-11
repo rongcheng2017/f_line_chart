@@ -437,10 +437,13 @@ class LineChartPainter extends CustomPainter {
     double max1 = (maxY.yValue / 10).ceil() * 10;
     //向下扩大
     double min1 = (minY.yValue / 10).floor() * 10;
+    double duration = 0.0;
     if (max1 - min1 == 0) {
-      max1 = max1 + 10;
+      duration = 10;
+    } else {
+      duration = (max1 - min1) / (xLineNums - 1);
     }
-    double duration = (max1 - min1) / (xLineNums - 1);
+
     if (minY.yValue > 10) {
       int a = duration ~/ 10;
       duration = (a + 1) * 10;
@@ -490,7 +493,6 @@ class LineChartPainter extends CustomPainter {
     double yLineHeightDuration =
         (size.height - topPadding - (showXLineText ? textHeight : 0)) /
             (xLineNums - 1);
-    var yLineStartN = maxV - duration * (xLineNums - 1).toInt();
 
     //不绘制文案
     if (!showYLineMark) return maxYLineMarkTextW;
@@ -522,6 +524,7 @@ class LineChartPainter extends CustomPainter {
         value = max(element.yValue, value);
       }
     }
+    if (value == 0) return 10;
     //向上扩大
     return (value / 10).ceil() * 10;
   }
