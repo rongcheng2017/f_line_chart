@@ -234,7 +234,7 @@ class LineChartPainter extends CustomPainter {
       List<Color> colors) {
     if (offset == null || lineChartPointConfig == null) {
       _selectedX = -1000;
-      SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         selectedCallback?.call(Offset.zero, null);
       });
       return;
@@ -289,7 +289,7 @@ class LineChartPainter extends CustomPainter {
     //选中事件回调
     if (selectedPoint?.x != _selectedX) {
       _selectedX = selectedPoint?.x ?? 0;
-      SchedulerBinding.instance?.addPostFrameCallback((timeStamp) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         selectedCallback?.call(
             Offset(selectedPoint?.x ?? 0, selectedPoint?.y ?? 0), res);
       });

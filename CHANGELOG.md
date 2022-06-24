@@ -69,3 +69,8 @@
 ## 1.1.4
 
 * fix bug：当所有y轴数据一样时，异常
+
+
+## 1.1.5
+
+* fix bug：null safety
