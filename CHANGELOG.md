@@ -74,3 +74,7 @@
 ## 1.1.5
 
 * fix bug：null safety
+
+## 1.1.6
+
+* fix bug：当points数据为空数组时，页面重绘问题。

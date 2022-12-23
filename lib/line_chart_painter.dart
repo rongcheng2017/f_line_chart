@@ -463,7 +463,7 @@ class LineChartPainter extends CustomPainter {
       required List<LineChartPoint>? points,
       bool useUnifyYUnit = false,
       double maxPointV = 10.0}) {
-    if (points == null) return 0;
+    if (points==null||points.length==0) return 0;
     double maxV;
     double minV;
     double duration;
